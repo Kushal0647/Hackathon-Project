@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - HamroFix</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 120px auto 40px;
+            padding: 0 20px;
+        }
+        
+        .dashboard-header {
+            background: linear-gradient(135deg, #e53e3e, #e53e3e);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+        
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e53e3e;
+        }
+        
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+        }
+        
+        .main-content {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            height: fit-content;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .tab-button.active {
+            background: #e53e3e;
+            color: white;
+        }
+        
+        .tab-content {
+            padding: 2rem;
+        }
+        
+        .booking-card {
+            border: 1px solid #e1e1e1;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: box-shadow 0.3s;
+        }
+        
+        .booking-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .booking-id {
+            font-weight: bold;
+            color: #e53e3e;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-confirmed {
+            background: #d4edda;
+            color: #e53e3e;
+        }
+        
+        .status-in-progress {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-completed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .quick-actions {
+            margin-bottom: 2rem;
+        }
+        
+        .action-button {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s;
+        }
+        
+        .action-button:hover {
+            background: #e53e3e;
+            color: white;
+            border-color: #e53e3e;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .tab-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="index.html"><img src="logo.jpg"></a>
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html">Home</a>
+                <a href="index.html#services">Services</a>
+                <a href="#contact">Contact</a>
+                <button class="btn-login" id="userNameBtn">Dashboard</button>
+                <button class="btn-signup" onclick="handleLogout()">Logout</button>
+            </nav>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1>Welcome back, <span id="userName">User</span>!</h1>
+            <p>Manage your bookings and explore our services</p>
+        </div>
+
+        <!-- Dashboard Stats -->
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalBookings">0</div>
+                <div>Total Bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeBookings">0</div>
+                <div>Active Bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedBookings">0</div>
+                <div>Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalSpent">Rs0</div>
+                <div>Total Spent</div>
+            </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <div class="main-content">
+                <div class="tab-buttons">
+                    <button class="tab-button active" onclick="switchTab('bookings')">My Bookings</button>
+                    <button class="tab-button" onclick="switchTab('history')">History</button>
+                    <button class="tab-button" onclick="switchTab('profile')">Profile</button>
+                </div>
+
+                <!-- Bookings Tab -->
+                <div id="bookings-tab" class="tab-content">
+                    <h3>Current Bookings</h3>
+                    <div id="currentBookings">
+                        <!-- Bookings will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- History Tab -->
+                <div id="history-tab" class="tab-content" style="display: none;">
+                    <h3>Booking History</h3>
+                    <div id="bookingHistory">
+                        <!-- History will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Profile Tab -->
+                <div id="profile-tab" class="tab-content" style="display: none;">
+                    <h3>Profile Information</h3>
+                    <form id="profileForm">
+                        <div class="form-group">
+                            <label for="profileName">Full Name:</label>
+                            <input type="text" id="profileName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileEmail">Email:</label>
+                            <input type="email" id="profileEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profilePhone">Phone:</label>
+                            <input type="tel" id="profilePhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileAddress">Address:</label>
+                            <textarea id="profileAddress" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="quick-actions">
+                    <h4>Quick Actions</h4>
+                    <a href="index.html#services" class="action-button">
+                        <i class="fas fa-plus"></i> Book New Service
+                    </a>
+                    <a href="#" class="action-button" onclick="showEmergencyBooking()">
+                        <i class="fas fa-exclamation-triangle"></i> Emergency Service
+                    </a>
+                    <a href="#" class="action-button" onclick="showSupport()">
+                        <i class="fas fa-headset"></i> Customer Support
+                    </a>
+                </div>
+
+                <div class="recent-activity">
+                    <h4>Recent Activity</h4>
+                    <div id="recentActivity">
+                        <!-- Recent activity will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            checkUserAuthentication();
+            loadUserData();
+            loadBookings();
+            loadStats();
+        });
+
+        function checkUserAuthentication() {
+            const isLoggedIn = localStorage.getItem('userLoggedIn');
+            if (!isLoggedIn) {
+                window.location.href = 'index.html';
+                return;
+            }
+        }
+
+        function loadUserData() {
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+                const user = JSON.parse(userData);
+                document.getElementById('userName').textContent = user.name.split(' ')[0];
+                document.getElementById('userNameBtn').textContent = `Hi, ${user.name.split(' ')[0]}`;
+                
+                // Fill profile form
+                document.getElementById('profileName').value = user.name || '';
+                document.getElementById('profileEmail').value = user.email || '';
+                document.getElementById('profilePhone').value = user.phone || '';
+            }
+        }
+
+        function loadBookings() {
+            // Sample booking data - in real app, this would come from PHP backend
+            const sampleBookings = [
+                {
+                    id: 'HS1234567890',
+                    service: 'Plumbing Service',
+                    date: '2024-12-15',
+                    time: '10:00 AM - 1:00 PM',
+                    status: 'confirmed',
+                    amount: 'Rs353',
+                    address: '123 Main Street, City',
+                    description: 'Kitchen sink repair'
+                },
+                {
+                    id: 'HS1234567891',
+                    service: 'Electrical Work',
+                    date: '2024-12-10',
+                    time: '2:00 PM - 5:00 PM',
+                    status: 'completed',
+                    amount: 'Rs471',
+                    address: '456 Oak Avenue, City',
+                    description: 'Ceiling fan installation'
+                }
+            ];
+
+            // Check for last booking from localStorage
+            const lastBooking = localStorage.getItem('lastBooking');
+            if (lastBooking) {
+                const booking = JSON.parse(lastBooking);
+                sampleBookings.unshift({
+                    id: booking.id,
+                    service: getServiceName(booking.service),
+                    date: booking.date,
+                    time: booking.timeSlot,
+                    status: booking.status,
+                    amount: booking.amount,
+                    address: 'Your Address',
+                    description: 'Recent booking'
+                });
+            }
+
+            displayBookings(sampleBookings);
+        }
+
+        function getServiceName(serviceType) {
+            const serviceNames = {
+                plumbing: 'Plumbing Service',
+                electrical: 'Electrical Work',
+                painting: 'Painting Service',
+                cleaning: 'Cleaning Service',
+                carpentry: 'Carpentry Service',
+                appliance: 'Appliance Repair',
+                ac: 'AC Repair',
+                civil: 'Civil Work'
+            };
+            return serviceNames[serviceType] || 'Home Service';
+        }
+
+        function displayBookings(bookings) {
+            const currentBookingsContainer = document.getElementById('currentBookings');
+            const historyContainer = document.getElementById('bookingHistory');
+            
+            let currentBookingsHTML = '';
+            let historyHTML = '';
+
+            bookings.forEach(booking => {
+                const bookingHTML = `
+                    <div class="booking-card">
+                        <div class="booking-header">
+                            <span class="booking-id">#${booking.id}</span>
+                            <span class="status-badge status-${booking.status}">${booking.status.toUpperCase()}</span>
+                        </div>
+                        <h4>${booking.service}</h4>
+                        <p><i class="fas fa-calendar"></i> ${booking.date} at ${booking.time}</p>
+                        <p><i class="fas fa-map-marker-alt"></i> ${booking.address}</p>
+                        <p><i class="fas fa-info-circle"></i> ${booking.description}</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                            <strong>${booking.amount}</strong>
+                            <div>
+                                ${booking.status === 'confirmed' ? 
+                                    '<button class="btn-primary" onclick="trackBooking(\'' + booking.id + '\')">Track</button>' :
+                                    '<button class="btn-primary" onclick="rebookService(\'' + booking.service + '\')">Rebook</button>'
+                                }
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                if (booking.status === 'confirmed' || booking.status === 'in-progress') {
+                    currentBookingsHTML += bookingHTML;
+                } else {
+                    historyHTML += bookingHTML;
+                }
+            });
+
+            currentBookingsContainer.innerHTML = currentBookingsHTML || '<p>No current bookings</p>';
+            historyContainer.innerHTML = historyHTML || '<p>No booking history</p>';
+        }
+
+        function loadStats() {
+            // Sample stats - in real app, this would come from PHP backend
+            const stats = {
+                total: 5,
+                active: 1,
+                completed: 4,
+                spent: 1500
+            };
+
+            document.getElementById('totalBookings').textContent = stats.total;
+            document.getElementById('activeBookings').textContent = stats.active;
+            document.getElementById('completedBookings').textContent = stats.completed;
+            document.getElementById('totalSpent').textContent = `Rs${stats.spent}`;
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').style.display = 'block';
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        function trackBooking(bookingId) {
+            alert(`Tracking booking ${bookingId}. Your service provider will arrive as scheduled.`);
+        }
+
+        function rebookService(serviceName) {
+            const serviceMap = {
+                'Plumbing Service': 'plumbing',
+                'Electrical Work': 'electrical',
+                'Painting Service': 'painting',
+                'Cleaning Service': 'cleaning',
+                'Carpentry Service': 'carpentry',
+                'Appliance Repair': 'appliance',
+                'AC Repair': 'ac',
+                'Civil Work': 'civil'
+            };
+            
+            const serviceType = serviceMap[serviceName] || 'plumbing';
+            window.location.href = `booking.html?service=${serviceType}`;
+        }
+
+        function showEmergencyBooking() {
+            const emergencyServices = ['plumbing', 'electrical', 'appliance'];
+            const randomService = emergencyServices[Math.floor(Math.random() * emergencyServices.length)];
+            window.location.href = `booking.html?service=${randomService}&emergency=true`;
+        }
+
+        function showSupport() {
+            alert('Customer Support: Call us at +91-9876543210 or email support@homeserve.com');
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('userLoggedIn');
+            localStorage.removeItem('userData');
+            window.location.href = 'index.html';
+        }
+
+        // Profile form handler
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const updatedUser = {
+                name: document.getElementById('profileName').value,
+                email: document.getElementById('profileEmail').value,
+                phone: document.getElementById('profilePhone').value,
+                address: document.getElementById('profileAddress').value
+            };
+            
+            // Update localStorage
+            localStorage.setItem('userData', JSON.stringify(updatedUser));
+            
+            // Show success message
+            alert('Profile updated successfully!');
+            
+            // Update display
+            document.getElementById('userName').textContent = updatedUser.name.split(' ')[0];
+            document.getElementById('userNameBtn').textContent = `Hi, ${updatedUser.name.split(' ')[0]}`;
+        });
+    </script>
+</body>
+</html>
